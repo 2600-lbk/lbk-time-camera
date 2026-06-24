@@ -24,6 +24,10 @@ defineEmits<{ close: [] }>()
         This app would not exist without their commitment to open data.
       </p>
 
+      <h3>Source code</h3>
+      <p><a href="https://github.com/2600-lbk/lbk-time-camera/">github.com/2600-lbk/lbk-time-camera</a></p>
+      <p>Comments, issues, and PRs are welcome!</p>
+
       <h3>Built with</h3>
       <ul>
         <li><a href="https://vuejs.org" target="_blank" rel="noopener">Vue 3</a> — reactive UI framework</li>

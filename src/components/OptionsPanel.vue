@@ -40,8 +40,7 @@ const SHAPES: { value: DrawShape; label: string }[] = [
 <template>
   <div class="options-panel">
     <div class="intro">
-      <h2>lbk-time-camera</h2>
-      <p>Pick an area of Lubbock on the map and watch it change over the years — then download a timelapse video to keep or share.</p>
+      <p>Pick an area of Lubbock on the map and watch it change over the years - then download a timelapse video to keep or share.</p>
     </div>
 
     <section>
@@ -96,8 +95,8 @@ const SHAPES: { value: DrawShape; label: string }[] = [
       </label>
       <input
         type="range"
-        min="3"
-        max="15"
+        min="5"
+        max="20"
         :value="modelValue.durationSec"
         @input="update({ durationSec: +($event.target as HTMLInputElement).value })"
       />
