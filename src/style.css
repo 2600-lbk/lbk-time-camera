@@ -1,0 +1,38 @@
+:root {
+  --accent: #aa3bff;
+  --bg: #0d0d0d;
+  --surface: #1a1a1a;
+  --border: #2e2e2e;
+  --text: #e0e0e0;
+  --text-muted: #888;
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  color-scheme: dark;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+#app {
+  height: 100%;
+}
+
+button {
+  font-family: var(--sans);
+  font-size: 0.9rem;
+}
+
+a {
+  color: var(--accent);
+}

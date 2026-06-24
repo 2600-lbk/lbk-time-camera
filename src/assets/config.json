@@ -1,0 +1,71 @@
+{
+    "base_url": "https://pubgis.ci.lubbock.tx.us/server/rest/services/Imagery/",
+    "sources": [
+        {
+            "year": 2010,
+            "layer": "Lubbock_Image_Cache_2010_State_Plane",
+            "pixelSizeX": 0.217,
+            "pixelSizeY": 0.217
+        },
+        {
+            "year": 2015,
+            "layer": "Lubbock_Image_Cache_2015_State_Plane",
+            "pixelSizeX": 0.2170138888888888,
+            "pixelSizeY": 0.2170138888888888
+        },
+        {
+            "year": 2016,
+            "layer": "Lubbock_Image_Cache_2016_State_Plane",
+            "pixelSizeX": 0.21701388888888895,
+            "pixelSizeY": 0.21701388888888895
+        },
+        {
+            "year": 2018,
+            "layer": "Lubbock_Image_Cache_2018_StatePlane",
+            "pixelSizeX": 0.2170138888888889,
+            "pixelSizeY": 0.2170138888888889
+        },
+        {
+            "year": 2019,
+            "layer": "Lubbock_Image_Cache_2019_State_Plane",
+            "pixelSizeX": 0.21192762586805558,
+            "pixelSizeY": 0.21192762586805558
+        },
+        {
+            "year": 2020,
+            "layer": "Lubbock_Image_Cache_2020_State_Plane",
+            "pixelSizeX": 0.21192762586805552,
+            "pixelSizeY": 0.21192762586805552
+        },
+        {
+            "year": 2021,
+            "layer": "Lubbock_Image_Cache_2021_State_Plane",
+            "pixelSizeX": 0.21192762586805558,
+            "pixelSizeY": 0.21192762586805558
+        },
+        {
+            "year": 2022,
+            "layer": "Lubbock_Image_Cache_2022_StatePlane",
+            "pixelSizeX": 0.21192762586805558,
+            "pixelSizeY": 0.21192762586805527
+        },
+        {
+            "year": 2023,
+            "layer": "Lubbock_Image_Cache_2023_StatePlane",
+            "pixelSizeX": 0.21192762586805558,
+            "pixelSizeY": 0.21192762586805558
+        },
+        {
+            "year": 2024,
+            "layer": "Lubbock_Image_Cache_2024_StatePlane",
+            "pixelSizeX": 0.21192762586805558,
+            "pixelSizeY": 0.21192762586805558
+        },
+        {
+            "year": 2025,
+            "layer": "Lubbock_Image_Cache_2025_StatePlane",
+            "pixelSizeX": 0.21192762586805558,
+            "pixelSizeY": 0.21192762586805527
+        }
+    ]
+}
