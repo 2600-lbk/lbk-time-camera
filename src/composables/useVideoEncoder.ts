@@ -1,5 +1,21 @@
 import { ref } from 'vue'
+import {
+  Output,
+  Mp4OutputFormat,
+  BufferTarget,
+  CanvasSource,
+  getFirstEncodableVideoCodec,
+} from 'mediabunny'
 import type { FetchedFrame, OutputOptions, CanvasDimensions } from '../types'
+
+export async function checkVideoEncoderSupport(): Promise<boolean> {
+  try {
+    const codec = await getFirstEncodableVideoCodec(['avc', 'vp9', 'av1'])
+    return codec !== null
+  } catch {
+    return false
+  }
+}
 
 export function useVideoEncoder() {
   const progress = ref(0)
@@ -20,77 +36,43 @@ export function useVideoEncoder() {
     canvas.width = dims.width
     canvas.height = dims.height
 
-    const fps = Math.ceil(frames.length / opts.durationSec)
-    const frameDurationMs = (opts.durationSec * 1000) / frames.length
+    const fps = frames.length / opts.durationSec
+    const frameDuration = opts.durationSec / frames.length
 
-    // Pick the best supported MIME type
-    const mimeType = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']
-      .find((t) => MediaRecorder.isTypeSupported(t)) ?? 'video/webm'
-
-    // Detect requestFrame() support (Chromium only)
-    const stream = canvas.captureStream(0)
-    const track = stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack & {
-      requestFrame?: () => void
-    }
-    const hasRequestFrame = typeof track.requestFrame === 'function'
-
-    if (!hasRequestFrame) {
-      // Fall back: captureStream at fixed fps, rely on interval timing
-      stream.getVideoTracks()[0].stop()
-      const fixedStream = canvas.captureStream(fps)
-      return encodeFallback(frames, renderFrame, canvas, fixedStream, mimeType, frameDurationMs)
-    }
-
-    const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8_000_000 })
-    const chunks: Blob[] = []
-    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data) }
-
-    recorder.start()
-    for (const frame of frames) {
-      renderFrame(frame, canvas)
-      track.requestFrame!()
-      await delay(frameDurationMs)
-      progress.value++
-    }
-    recorder.stop()
-
-    await new Promise<void>((resolve) => {
-      recorder.onstop = () => {
-        videoBlob.value = new Blob(chunks, { type: mimeType })
-        resolve()
-      }
+    const codec = await getFirstEncodableVideoCodec(['avc', 'vp9', 'av1'], {
+      width: dims.width,
+      height: dims.height,
+      bitrate: 8_000_000,
     })
+    if (!codec) throw new Error('No supported video codec found')
 
-    isEncoding.value = false
+    const target = new BufferTarget()
+    const output = new Output({ format: new Mp4OutputFormat(), target })
+
+    const videoSource = new CanvasSource(canvas, {
+      codec,
+      bitrate: 8_000_000,
+      keyFrameInterval: frameDuration, // every frame is a keyframe
+    })
+    output.addVideoTrack(videoSource, { frameRate: fps })
+
+    try {
+      await output.start()
+
+      for (let i = 0; i < frames.length; i++) {
+        renderFrame(frames[i], canvas)
+        await videoSource.add(i * frameDuration, frameDuration)
+        progress.value++
+      }
+
+      videoSource.close()
+      await output.finalize()
+
+      videoBlob.value = new Blob([target.buffer], { type: 'video/mp4' })
+    } finally {
+      isEncoding.value = false
+    }
   }
 
   return { progress, videoBlob, isEncoding, encode }
-}
-
-async function encodeFallback(
-  frames: FetchedFrame[],
-  renderFrame: (frame: FetchedFrame, canvas: HTMLCanvasElement) => void,
-  canvas: HTMLCanvasElement,
-  stream: MediaStream,
-  mimeType: string,
-  frameDurationMs: number,
-): Promise<void> {
-  const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8_000_000 })
-  const chunks: Blob[] = []
-  recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data) }
-
-  recorder.start()
-  for (const frame of frames) {
-    renderFrame(frame, canvas)
-    await delay(frameDurationMs)
-  }
-  recorder.stop()
-
-  await new Promise<void>((resolve) => {
-    recorder.onstop = () => resolve()
-  })
-}
-
-function delay(ms: number) {
-  return new Promise<void>((resolve) => setTimeout(resolve, ms))
 }

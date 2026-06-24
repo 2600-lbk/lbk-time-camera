@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import AppToolbar from './components/AppToolbar.vue'
 import OptionsPanel from './components/OptionsPanel.vue'
 import MapView from './components/MapView.vue'
@@ -9,12 +9,17 @@ import VideoOutput from './components/VideoOutput.vue'
 import AboutModal from './components/AboutModal.vue'
 import { useConfig } from './composables/useConfig'
 import { useImageFetch, bufferExtentToAspect } from './composables/useImageFetch'
-import { useVideoEncoder } from './composables/useVideoEncoder'
+import { useVideoEncoder, checkVideoEncoderSupport } from './composables/useVideoEncoder'
 import { useFrameRenderer } from './composables/useFrameRenderer'
 import { defaultOptions, computeDims } from './types'
 import type { AppStep, Extent } from './types'
 
 const { sources } = useConfig()
+
+const canEncodeVideo = ref<boolean | null>(null)
+onMounted(async () => {
+  canEncodeVideo.value = await checkVideoEncoderSupport()
+})
 
 const step = ref<AppStep>('options')
 const opts = ref(defaultOptions())
@@ -74,6 +79,7 @@ function resetAll() {
 
     <AppToolbar
       :step="step"
+      :can-encode-video="canEncodeVideo"
       @about="showAbout = true"
       @start-over="resetAll"
     />
@@ -110,8 +116,13 @@ function resetAll() {
           :dims="dims"
         />
         <div class="preview-actions">
-          <button v-if="videoBlob" class="btn-primary" @click="step = 'done'">View Generated Video →</button>
-          <button v-else class="btn-primary" @click="startEncoding">Generate Video →</button>
+          <template v-if="canEncodeVideo === false">
+            <p class="encoding-unavailable">Video encoding is not supported in your browser. You can still preview frames and download them as individual PNGs.</p>
+          </template>
+          <template v-else>
+            <button v-if="videoBlob" class="btn-primary" @click="step = 'done'">View Generated Video →</button>
+            <button v-else class="btn-primary" @click="startEncoding">Generate Video →</button>
+          </template>
         </div>
       </template>
 
@@ -177,5 +188,12 @@ main {
   border-radius: 6px;
   font-size: 1rem;
   cursor: pointer;
+}
+.encoding-unavailable {
+  color: #888;
+  font-size: 0.85rem;
+  text-align: center;
+  margin: 0;
+  max-width: 36ch;
 }
 </style>

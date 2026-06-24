@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AppStep } from '../types'
 
-const props = defineProps<{ step: AppStep }>()
+const props = defineProps<{ step: AppStep; canEncodeVideo: boolean | null }>()
 defineEmits<{ about: []; startOver: [] }>()
 
 const STEPS: AppStep[] = ['options', 'draw', 'fetching', 'preview', 'encoding', 'done']
@@ -29,6 +29,7 @@ function stepIndex(s: AppStep) { return STEPS.indexOf(s) }
         :class="{
           active: s === step,
           done: stepIndex(s) < stepIndex(step),
+          unavailable: canEncodeVideo === false && (s === 'encoding' || s === 'done'),
         }"
       >{{ LABELS[s] }}</span>
     </nav>
@@ -76,6 +77,7 @@ function stepIndex(s: AppStep) { return STEPS.indexOf(s) }
   border: 1px solid transparent;
 }
 .step.done { color: #777; }
+.step.unavailable { text-decoration: line-through; color: #3a3a3a; }
 .step.active {
   border-color: #aa3bff;
   color: #cc88ff;
