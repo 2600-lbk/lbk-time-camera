@@ -68,6 +68,7 @@ export function useVideoEncoder() {
       videoSource.close()
       await output.finalize()
 
+      if (!target.buffer) throw new Error('Encoding produced no output')
       videoBlob.value = new Blob([target.buffer], { type: 'video/mp4' })
     } finally {
       isEncoding.value = false
