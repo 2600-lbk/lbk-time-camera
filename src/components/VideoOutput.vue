@@ -13,13 +13,21 @@ const props = defineProps<{
   dims: CanvasDimensions
 }>()
 
+const emit = defineEmits<{ backToPreview: [] }>()
 
 const offscreenCanvas = ref<HTMLCanvasElement | null>(null)
 const { renderFrameToBlob } = useFrameRenderer(offscreenCanvas)
 const { isExporting, exportZip } = useZipExport()
 
 const videoUrl = ref<string | null>(null)
-const videoFilename = computed(() => `lbk-timelapse-${Date.now()}.webm`)
+const videoExt = computed(() => props.videoBlob.type === 'video/mp4' ? 'mp4' : 'webm')
+const videoFilename = computed(() => `lbk-timelapse-${Date.now()}.${videoExt.value}`)
+
+const canShare = computed(() => {
+  if (!navigator.share || !navigator.canShare) return false
+  const file = new File([props.videoBlob], `lbk-timelapse.${videoExt.value}`, { type: props.videoBlob.type })
+  return navigator.canShare({ files: [file] })
+})
 
 onMounted(() => {
   videoUrl.value = URL.createObjectURL(props.videoBlob)
@@ -34,6 +42,11 @@ async function handleZipExport() {
     renderFrameToBlob(frame, props.opts, props.drawnExtent, props.bufferedExtent, props.dims)
   )
 }
+
+async function handleShare() {
+  const file = new File([props.videoBlob], `lbk-timelapse.${videoExt.value}`, { type: props.videoBlob.type })
+  await navigator.share({ files: [file] })
+}
 </script>
 
 <template>
@@ -44,9 +57,11 @@ async function handleZipExport() {
     <video v-if="videoUrl" :src="videoUrl" controls autoplay loop class="video-player"></video>
 
     <div class="actions">
+      <button @click="emit('backToPreview')" class="btn btn-secondary">← Back to Preview</button>
       <a :href="videoUrl ?? ''" :download="videoFilename" class="btn btn-primary">
-        Download WebM
+        Download Video
       </a>
+      <button v-if="canShare" @click="handleShare" class="btn">Share</button>
       <button @click="handleZipExport" :disabled="isExporting" class="btn">
         {{ isExporting ? 'Exporting…' : 'Download PNG Frames (ZIP)' }}
       </button>

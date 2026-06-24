@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useMapDraw } from '../composables/useMapDraw'
 import type { DrawShape, Extent } from '../types'
 
@@ -11,6 +11,12 @@ const emit = defineEmits<{
 
 const mapEl = ref<HTMLDivElement | null>(null)
 const { drawnExtent, sizeError, initMap, startDraw, clearDraw, destroyMap } = useMapDraw(mapEl)
+
+const drawHint = computed(() =>
+  props.shape === 'circle'
+    ? 'Click to place the center, then click again to set the radius (max 300 m across)'
+    : 'Click to start a corner, then click again to finish the rectangle (max 300 m on any side)'
+)
 
 function confirm() {
   if (drawnExtent.value) emit('geometryDrawn', { extent: drawnExtent.value })
@@ -39,6 +45,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="map-wrapper">
     <div ref="mapEl" class="map-container"></div>
+    <p class="map-hint">{{ drawHint }}</p>
     <p v-if="sizeError" class="size-error">{{ sizeError }}</p>
     <div class="map-controls">
       <button @click="handleClear" :disabled="!drawnExtent" class="btn">Clear</button>
@@ -56,6 +63,12 @@ onBeforeUnmount(() => {
 .map-container {
   flex: 1;
   min-height: 400px;
+}
+.map-hint {
+  margin: 0;
+  padding: 5px 12px;
+  color: #888;
+  font-size: 0.8rem;
 }
 .size-error {
   margin: 0;

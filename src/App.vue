@@ -110,7 +110,8 @@ function resetAll() {
           :dims="dims"
         />
         <div class="preview-actions">
-          <button class="btn-primary" @click="startEncoding">Generate Video →</button>
+          <button v-if="videoBlob" class="btn-primary" @click="step = 'done'">View Generated Video →</button>
+          <button v-else class="btn-primary" @click="startEncoding">Generate Video →</button>
         </div>
       </template>
 
@@ -130,6 +131,7 @@ function resetAll() {
         :drawn-extent="drawnExtent"
         :buffered-extent="bufferedExtent"
         :dims="dims"
+        @back-to-preview="step = 'preview'"
       />
     </main>
 
