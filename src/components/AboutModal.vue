@@ -7,11 +7,16 @@ defineEmits<{ close: [] }>()
     <div class="modal" role="dialog" aria-modal="true">
       <button class="close-btn" @click="$emit('close')" aria-label="Close">✕</button>
 
-      <h2>lbk-time-camera</h2>
-      <p class="tagline">Select an area of Lubbock and watch it change over time.</p>
+      <div class="about-header">
+        <img src="/app-icon-full.png" alt="" class="about-icon" aria-hidden="true" />
+        <div>
+          <h2>lbk-time-camera</h2>
+          <p class="tagline">Select an area of Lubbock and watch it change over time.</p>
+        </div>
+      </div>
 
       <p>
-        This app uses aerial imagery captured by the City of Lubbock across multiple years to
+        This app uses high resolution aerial imagery multiple years to
         generate a downloadable timelapse video of any location within city limits.
         Draw a box or circle on the map, fetch the imagery, preview the frames, and export
         a WebM video or a ZIP of individual PNG frames.
@@ -81,6 +86,17 @@ defineEmits<{ close: [] }>()
   color: #ddd;
 }
 
+.about-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.about-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
 h2 {
   margin: 0 0 4px;
   font-size: 1.3rem;
@@ -93,7 +109,7 @@ h3 {
 }
 
 .tagline {
-  margin: 0 0 16px;
+  margin: 0;
   color: #aa3bff;
   font-style: italic;
 }

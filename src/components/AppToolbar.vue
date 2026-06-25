@@ -19,7 +19,10 @@ function stepIndex(s: AppStep) { return STEPS.indexOf(s) }
 
 <template>
   <header class="toolbar">
-    <span class="title">lbk-time-camera</span>
+    <span class="title">
+      <img src="/app-icon-full.png" alt="" class="title-icon" aria-hidden="true" />
+      lbk-time-camera
+    </span>
 
     <nav class="steps">
       <span
@@ -56,11 +59,19 @@ function stepIndex(s: AppStep) { return STEPS.indexOf(s) }
   flex-shrink: 0;
 }
 .title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-weight: 700;
   font-size: 0.95rem;
   white-space: nowrap;
   font-family: ui-monospace, monospace;
   color: #cc88ff;
+}
+.title-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 .steps {
   display: flex;
