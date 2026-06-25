@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { useConfig } from '../composables/useConfig'
+
 defineEmits<{ close: [] }>()
+
+const { sources } = useConfig()
+const years = sources.map(s => s.year)
 </script>
 
 <template>
@@ -16,29 +21,41 @@ defineEmits<{ close: [] }>()
       </div>
 
       <p>
-        This app uses high resolution aerial imagery multiple years to
-        generate a downloadable timelapse video of any location within city limits.
+        This app uses high resolution aerial imagery from multiple years to
+        generate a downloadable timelapse video of any location within Lubbock County, Texas.
         Draw a box or circle on the map, fetch the imagery, preview the frames, and export
         a WebM video or a ZIP of individual PNG frames.
       </p>
 
+      <h3>Imagery</h3>
+      <p>
+        {{ years.length }} years are currently available: {{ years.join(', ') }}.
+      </p>
+      <p>
+        Resolution is approximately 6.4 cm (2.6 in) per pixel across all years.
+      </p>
+
       <h3>Special thanks</h3>
       <p>
-        The <a href="https://www.mylubbock.us/318/GIS-Data-Services" target="blank">City of Lubbock GIS & Data Services Department</a>
+        The <a href="https://www.mylubbock.us/318/GIS-Data-Services" target="blank">City of Lubbock GIS & Data Services
+          Department</a>
         makes high-quality aerial imagery freely available to the public.
         This app would not exist without their commitment to open data.
       </p>
 
       <h3>Source code</h3>
-      <p><a href="https://github.com/2600-lbk/lbk-time-camera/">github.com/2600-lbk/lbk-time-camera</a></p>
+      <p><a href="https://github.com/2600-lbk/lbk-time-camera/" target="_blank"
+          rel="noopener">github.com/2600-lbk/lbk-time-camera</a></p>
       <p>Comments, issues, and PRs are welcome!</p>
 
       <h3>Built with</h3>
       <ul>
-        <li><a href="https://vuejs.org" target="_blank" rel="noopener">Vue 3</a> — reactive UI framework</li>
-        <li><a href="https://openlayers.org" target="_blank" rel="noopener">OpenLayers</a> — mapping, drawing, and
-          ArcGIS imagery</li>
-        <li><a href="https://stuk.github.io/jszip/" target="_blank" rel="noopener">JSZip</a> — PNG frame export</li>
+        <li><a href="https://vuejs.org" target="_blank" rel="noopener">Vue 3</a> - reactive UI framework</li>
+        <li><a href="https://openlayers.org" target="_blank" rel="noopener">OpenLayers</a> - mapping, drawing, and
+          ArcGIS imagery loader</li>
+        <li><a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> - base map</li>
+        <li><a href="https://mediabunny.dev" target="_blank" rel="noopener">Mediabunny</a> - rendering video</li>
+        <li><a href="https://stuk.github.io/jszip/" target="_blank" rel="noopener">JSZip</a> - PNG frame export</li>
       </ul>
 
       <button class="btn-close-bottom" @click="$emit('close')">Close</button>
@@ -92,11 +109,13 @@ defineEmits<{ close: [] }>()
   gap: 12px;
   margin-bottom: 16px;
 }
+
 .about-icon {
   width: 40px;
   height: 40px;
   flex-shrink: 0;
 }
+
 h2 {
   margin: 0 0 4px;
   font-size: 1.3rem;
