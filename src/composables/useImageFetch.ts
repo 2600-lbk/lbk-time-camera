@@ -88,7 +88,7 @@ function fetchOne(
   extent: Extent,
   resolution: number,
   proj: ReturnType<typeof getProjection>,
-  _dims: CanvasDimensions,
+  dims: CanvasDimensions,
 ): Promise<FetchedFrame> {
   return new Promise<FetchedFrame>((resolve, reject) => {
     let capturedBitmap: ImageBitmap | null = null
@@ -98,7 +98,8 @@ function fetchOne(
       params: { FORMAT: 'PNG', TRANSPARENT: 'FALSE' },
       imageLoadFunction: async (imageWrapper, src) => {
         try {
-          const res = await fetch(src)
+          const fixedSrc = src.replace(/SIZE=[^&]+/i, `SIZE=${dims.width}%2C${dims.height}`)
+          const res = await fetch(fixedSrc)
           const contentType = res.headers.get('content-type') ?? ''
           if (!contentType.includes('image')) {
             throw new Error(`Unexpected content-type: ${contentType}`)

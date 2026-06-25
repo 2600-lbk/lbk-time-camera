@@ -10,12 +10,12 @@ const emit = defineEmits<{
 }>()
 
 const mapEl = ref<HTMLDivElement | null>(null)
-const { drawnExtent, sizeError, initMap, startDraw, clearDraw, destroyMap } = useMapDraw(mapEl)
+const { drawnExtent, initMap, startDraw, clearDraw, destroyMap } = useMapDraw(mapEl)
 
 const drawHint = computed(() =>
   props.shape === 'circle'
-    ? 'Click to place the center, then click again to set the radius (max 300 m across)'
-    : 'Click to start a corner, then click again to finish the rectangle (max 300 m on any side)'
+    ? 'Click to place the center, then click again to set the radius'
+    : 'Click to start a corner, then click again to finish the rectangle'
 )
 
 function confirm() {
@@ -46,7 +46,6 @@ onBeforeUnmount(() => {
   <div class="map-wrapper">
     <div ref="mapEl" class="map-container"></div>
     <p class="map-hint">{{ drawHint }}</p>
-    <p v-if="sizeError" class="size-error">{{ sizeError }}</p>
     <div class="map-controls">
       <button @click="handleClear" :disabled="!drawnExtent" class="btn">Clear</button>
       <button @click="confirm" :disabled="!drawnExtent" class="btn btn-primary">Confirm Area</button>
@@ -69,13 +68,6 @@ onBeforeUnmount(() => {
   padding: 5px 12px;
   color: #888;
   font-size: 0.8rem;
-}
-.size-error {
-  margin: 0;
-  padding: 6px 12px;
-  background: #5c1a1a;
-  color: #ffaaaa;
-  font-size: 0.85rem;
 }
 .map-controls {
   padding: 8px 12px;
