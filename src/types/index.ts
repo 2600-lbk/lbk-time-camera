@@ -60,10 +60,10 @@ export function computeDims(opts: OutputOptions): CanvasDimensions {
 
 export function defaultOptions(): OutputOptions {
   return {
-    aspectRatio: '16:9',
-    resolution: 'hd',
-    durationSec: 8,
-    labelPosition: 'bottom-right',
+    aspectRatio: '1:1',
+    resolution: 'mobile',
+    durationSec: 11,
+    labelPosition: 'top-center',
     fontSize: 72,
     drawShape: 'box',
   }
