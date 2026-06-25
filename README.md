@@ -2,13 +2,9 @@
 
 ![logo](./public/android-chrome-192x192.png)
 
-Pick an area of Lubbock on the map and watch it change over the years — then download a timelapse video to keep or share.
+Pick an area of Lubbock County, Texas, USA on the map and watch it change over the years.
 
 Uses the City of Lubbock's [aerial imagery service](https://pubgis.ci.lubbock.tx.us/server/rest/services/Imagery) - high-resolution (~6.5cm/pix) imagery captured across multiple years, made available by the City of Lubbock [GIS & Data Services Department](https://www.mylubbock.us/318/GIS-Data-Services).
-
-## Contributing
-
-Contributions, bug reports, and feature ideas are welcome. Open an issue or pull request at [github.com/2600-lbk/lbk-time-camera](https://github.com/2600-lbk/lbk-time-camera). If you have a suggestion but don't want to write code, an issue with a description is just as valuable.
 
 ## How it works
 
@@ -20,6 +16,10 @@ Contributions, bug reports, and feature ideas are welcome. Open an issue or pull
 6. The result can be saved as a video or as a ZIP of individual PNG frames.
 
 The app is entirely front-end — no server component. It can be served as a static site (e.g. GitHub Pages).
+
+## Contributing
+
+Contributions, bug reports, and feature ideas are welcome. Open an issue or pull request at [github.com/2600-lbk/lbk-time-camera](https://github.com/2600-lbk/lbk-time-camera). If you have a suggestion but don't want to write code, an issue with a description is just as valuable.
 
 ## Getting started
 
@@ -42,5 +42,3 @@ To build for production:
 npm run build
 npm run preview   # serve the built output locally
 ```
-
-**Stack:** Vue 3 + TypeScript + Vite. Source is in `src/` — composables handle map drawing (`useMapDraw`), image fetching (`useImageFetch`), frame rendering (`useFrameRenderer`), and video encoding (`useVideoEncoder`).
