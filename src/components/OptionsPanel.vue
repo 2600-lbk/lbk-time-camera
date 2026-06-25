@@ -18,8 +18,8 @@ const frameDurationMs = computed(() =>
 
 const ASPECT_RATIOS: AspectRatio[] = ['1:1', '4:3', '16:9', '9:16']
 const RESOLUTIONS: { value: ResolutionPreset; label: string }[] = [
-  { value: 'hd', label: 'HD (1920px long edge)' },
   { value: 'mobile', label: 'Mobile (1080px long edge)' },
+  { value: 'hd', label: 'HD (1920px long edge)' },
 ]
 const LABEL_POSITIONS: { value: LabelPosition; label: string }[] = [
   { value: 'top-left', label: 'Top left' },

@@ -102,7 +102,7 @@ function resetAll() {
         <ProgressBar
           :value="fetchProgress"
           :max="sources.length"
-          label="Fetching imagery"
+          label="Fetching imagery from the City"
         />
         <p v-if="fetchError" class="error-text">{{ fetchError }}</p>
       </div>

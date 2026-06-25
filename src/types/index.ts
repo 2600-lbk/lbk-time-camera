@@ -2,7 +2,7 @@ export type AppStep = 'options' | 'draw' | 'fetching' | 'preview' | 'encoding' |
 
 export type AspectRatio = '1:1' | '4:3' | '16:9' | '9:16'
 
-export type ResolutionPreset = 'hd' | 'mobile'
+export type ResolutionPreset = 'mobile' | 'hd'
 
 export type LabelPosition =
   | 'top-left' | 'top-center' | 'top-right'
