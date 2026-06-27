@@ -6,10 +6,13 @@ import VectorLayer from 'ol/layer/Vector'
 import OSM from 'ol/source/OSM'
 import VectorSource from 'ol/source/Vector'
 import Draw, { createBox } from 'ol/interaction/Draw'
+import Feature from 'ol/Feature'
+import { fromExtent } from 'ol/geom/Polygon'
 import { fromLonLat } from 'ol/proj'
 import GeoJSON from 'ol/format/GeoJSON'
 import { getVectorContext } from 'ol/render'
 import Fill from 'ol/style/Fill'
+import Stroke from 'ol/style/Stroke'
 import Style from 'ol/style/Style'
 import type RenderEvent from 'ol/render/Event'
 import type { Extent, DrawShape } from '../types'
@@ -23,6 +26,12 @@ export function useMapDraw(containerRef: Ref<HTMLElement | null>) {
   let map: Map | null = null
   let drawInteraction: Draw | null = null
   const vectorSource = new VectorSource()
+  const frameSource = new VectorSource()
+
+  const frameStyle = new Style({
+    stroke: new Stroke({ color: '#cc88ff', width: 2, lineDash: [6, 4] }),
+    fill: new Fill({ color: 'rgba(170, 59, 255, 0.06)' }),
+  })
 
   function initMap() {
     if (!containerRef.value) return
@@ -47,11 +56,12 @@ export function useMapDraw(containerRef: Ref<HTMLElement | null>) {
       ctx.globalCompositeOperation = 'source-over'
     })
 
+    const frameLayer = new VectorLayer({ source: frameSource, style: frameStyle })
     const vectorLayer = new VectorLayer({ source: vectorSource })
 
     map = new Map({
       target: containerRef.value,
-      layers: [osmLayer, vectorLayer],
+      layers: [osmLayer, frameLayer, vectorLayer],
       view: new View({
         center: LUBBOCK_CENTER,
         zoom: 16,
@@ -74,6 +84,7 @@ export function useMapDraw(containerRef: Ref<HTMLElement | null>) {
 
     drawInteraction.on('drawstart', () => {
       vectorSource.clear()
+      frameSource.clear()
       drawnExtent.value = null
     })
 
@@ -87,7 +98,14 @@ export function useMapDraw(containerRef: Ref<HTMLElement | null>) {
 
   function clearDraw() {
     vectorSource.clear()
+    frameSource.clear()
     drawnExtent.value = null
+  }
+
+  /** Draw (or clear) a rectangle showing the captured frame around the selection. */
+  function setFrame(extent: Extent | null) {
+    frameSource.clear()
+    if (extent) frameSource.addFeature(new Feature(fromExtent(extent)))
   }
 
   function removeDraw() {
@@ -108,6 +126,7 @@ export function useMapDraw(containerRef: Ref<HTMLElement | null>) {
     initMap,
     startDraw,
     clearDraw,
+    setFrame,
     destroyMap,
   }
 }

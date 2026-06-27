@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useMapDraw } from '../composables/useMapDraw'
+import { bufferExtentToAspect } from '../composables/useImageFetch'
+import { computeDims } from '../types'
 import type { OutputOptions, AspectRatio, ResolutionPreset, DrawShape, Extent } from '../types'
 
 const props = defineProps<{ modelValue: OutputOptions }>()
@@ -25,7 +27,17 @@ const RESOLUTIONS: { value: ResolutionPreset; label: string }[] = [
 ]
 
 const mapEl = ref<HTMLDivElement | null>(null)
-const { drawnExtent, initMap, startDraw, clearDraw, destroyMap } = useMapDraw(mapEl)
+const { drawnExtent, initMap, startDraw, clearDraw, setFrame, destroyMap } = useMapDraw(mapEl)
+
+// Show the captured frame (selection expanded to the chosen aspect ratio) before confirming.
+watch([drawnExtent, () => props.modelValue.aspectRatio], () => {
+  if (!drawnExtent.value) {
+    setFrame(null)
+    return
+  }
+  const dims = computeDims(props.modelValue)
+  setFrame(bufferExtentToAspect(drawnExtent.value, dims.width / dims.height))
+})
 
 const drawHint = computed(() =>
   props.modelValue.drawShape === 'circle'
