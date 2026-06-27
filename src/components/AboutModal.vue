@@ -23,8 +23,10 @@ const years = sources.map(s => s.year)
       <p>
         This app uses high resolution aerial imagery from multiple years to
         generate a downloadable timelapse video of any location within Lubbock County, Texas.
-        Draw a box or circle on the map, fetch the imagery, preview the frames, and export
-        a WebM video or a ZIP of individual PNG frames.
+      </p>
+      <p>
+        To begin: draw a box or circle on the map, fetch the imagery, preview the frames, and export
+        a video or a ZIP of individual PNG frames.
       </p>
 
       <h3>Imagery</h3>
