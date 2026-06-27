@@ -8,12 +8,12 @@ Uses the City of Lubbock's [aerial imagery service](https://pubgis.ci.lubbock.tx
 
 ## How it works
 
-1. The user draws a box or circle on an OpenStreetMap base map centered on Lubbock.
-2. The selection is validated (max ~300m in any dimension) and expanded to match the chosen output aspect ratio.
+1. The user draws a box or circle on an OpenStreetMap base map centered on Lubbock. Output settings — aspect ratio, resolution, and draw shape — are chosen right on the map.
+2. The selection is expanded to match the chosen output aspect ratio. The resulting capture frame is previewed as a rectangle on the map so the framing is clear before confirming.
 3. For each of the 11 available imagery years, the app requests a high-resolution export from the City's ArcGIS ImageServer using `ol/source/ImageArcGISRest`. Images are fetched in parallel with a concurrency limit of 3 to be kind to the City's servers.
-4. Each frame is rendered to an HTML Canvas: the aerial image is drawn first, then a dark vignette overlay highlights the selected area, then a configurable year label and a small `lbk-time-camera` watermark are drawn on top.
-5. Frames are sequenced into a video using the browser's built-in APIs.
-6. The result can be saved as a video or as a ZIP of individual PNG frames.
+4. Each frame is rendered to an HTML Canvas: the aerial image is drawn first, then a dark vignette overlay highlights the selected area, then a configurable year label and a small `lbk-time-camera` watermark are drawn on top. The label position and font size can be adjusted on the preview, re-rendering instantly without re-fetching imagery.
+5. Frames are encoded into an MP4 video (H.264 via [mediabunny](https://mediabunny.dev), falling back to VP9/AV1) with a short crossfade between years.
+6. The result can be saved as an MP4 video or as a ZIP of individual PNG frames.
 
 The app is entirely front-end — no server component. It can be served as a static site (e.g. GitHub Pages).
 
