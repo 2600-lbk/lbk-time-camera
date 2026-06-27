@@ -1,20 +1,20 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { AppStep } from '../types'
 
 const props = defineProps<{ step: AppStep; canEncodeVideo: boolean | null }>()
 defineEmits<{ about: []; startOver: [] }>()
 
-const STEPS: AppStep[] = ['options', 'draw', 'fetching', 'preview', 'encoding', 'done']
-const LABELS: Record<AppStep, string> = {
-  options: 'Options',
-  draw: 'Draw',
-  fetching: 'Fetching',
-  preview: 'Preview',
-  encoding: 'Encoding',
-  done: 'Done',
-}
+type Stage = { key: string; label: string; steps: AppStep[] }
+const STAGES: Stage[] = [
+  { key: 'draw', label: 'Draw', steps: ['draw', 'fetching'] },
+  { key: 'preview', label: 'Preview', steps: ['preview', 'encoding'] },
+  { key: 'share', label: 'Share', steps: ['done'] },
+]
 
-function stepIndex(s: AppStep) { return STEPS.indexOf(s) }
+const activeIndex = computed(() =>
+  STAGES.findIndex(stage => stage.steps.includes(props.step))
+)
 </script>
 
 <template>
@@ -26,20 +26,20 @@ function stepIndex(s: AppStep) { return STEPS.indexOf(s) }
 
     <nav class="steps">
       <span
-        v-for="s in STEPS"
-        :key="s"
+        v-for="(stage, i) in STAGES"
+        :key="stage.key"
         class="step"
         :class="{
-          active: s === step,
-          done: stepIndex(s) < stepIndex(step),
-          unavailable: canEncodeVideo === false && (s === 'encoding' || s === 'done'),
+          active: i === activeIndex,
+          done: i < activeIndex,
+          unavailable: canEncodeVideo === false && stage.key === 'share',
         }"
-      >{{ LABELS[s] }}</span>
+      >{{ stage.label }}</span>
     </nav>
 
     <div class="toolbar-actions">
       <button
-        v-if="step !== 'options'"
+        v-if="step !== 'draw'"
         class="btn-ghost"
         @click="$emit('startOver')"
       >Start Over</button>

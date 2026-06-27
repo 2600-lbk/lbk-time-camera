@@ -1,4 +1,4 @@
-export type AppStep = 'options' | 'draw' | 'fetching' | 'preview' | 'encoding' | 'done'
+export type AppStep = 'draw' | 'fetching' | 'preview' | 'encoding' | 'done'
 
 export type AspectRatio = '1:1' | '4:3' | '16:9' | '9:16'
 

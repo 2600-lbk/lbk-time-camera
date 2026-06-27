@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import AppToolbar from './components/AppToolbar.vue'
-import OptionsPanel from './components/OptionsPanel.vue'
 import MapView from './components/MapView.vue'
 import FramePreview from './components/FramePreview.vue'
 import ProgressBar from './components/ProgressBar.vue'
@@ -21,7 +20,7 @@ onMounted(async () => {
   canEncodeVideo.value = await checkVideoEncoderSupport()
 })
 
-const step = ref<AppStep>('options')
+const step = ref<AppStep>('draw')
 const opts = ref(defaultOptions())
 const drawnExtent = ref<Extent | null>(null)
 const bufferedExtent = ref<Extent | null>(null)
@@ -65,12 +64,24 @@ async function startEncoding() {
 
 function resetAll() {
   revokeFrames()
-  step.value = 'options'
+  step.value = 'draw'
   opts.value = defaultOptions()
   drawnExtent.value = null
   bufferedExtent.value = null
   videoBlob.value = null
 }
+
+// Editing render-time or encode-time options after a video exists makes it stale.
+watch(
+  () => [opts.value.labelPosition, opts.value.fontSize, opts.value.durationSec],
+  () => { videoBlob.value = null },
+)
+
+const frameDurationMs = computed(() =>
+  frames.value.length
+    ? Math.round((opts.value.durationSec * 1000) / frames.value.length)
+    : 0,
+)
 </script>
 
 <template>
@@ -85,16 +96,9 @@ function resetAll() {
     />
 
     <main>
-      <OptionsPanel
-        v-if="step === 'options'"
-        v-model="opts"
-        :source-count="sources.length"
-        @next="step = 'draw'"
-      />
-
       <MapView
         v-if="step === 'draw'"
-        :shape="opts.drawShape"
+        v-model="opts"
         @geometry-drawn="onGeometryDrawn"
       />
 
@@ -110,7 +114,7 @@ function resetAll() {
       <template v-if="step === 'preview' && drawnExtent && bufferedExtent">
         <FramePreview
           :frames="frames"
-          :opts="opts"
+          v-model:opts="opts"
           :drawn-extent="drawnExtent"
           :buffered-extent="bufferedExtent"
           :dims="dims"
@@ -120,6 +124,19 @@ function resetAll() {
             <p class="encoding-unavailable">Video encoding is not supported in your browser. You can still preview frames and download them as individual PNGs.</p>
           </template>
           <template v-else>
+            <div class="duration-field">
+              <label class="field-label">
+                Total Duration: {{ opts.durationSec }}s
+                <span class="hint">({{ frameDurationMs }}ms per frame × {{ frames.length }} years)</span>
+              </label>
+              <input
+                type="range"
+                min="5"
+                max="20"
+                :value="opts.durationSec"
+                @input="opts.durationSec = +($event.target as HTMLInputElement).value"
+              />
+            </div>
             <button v-if="videoBlob" class="btn-primary" @click="step = 'done'">View Generated Video →</button>
             <button v-else class="btn-primary" @click="startEncoding">Generate Video →</button>
           </template>
@@ -177,9 +194,21 @@ main {
 }
 .preview-actions {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
   padding: 16px;
 }
+.duration-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  max-width: 420px;
+}
+.duration-field .field-label { font-size: 0.85rem; color: #aaa; }
+.duration-field .hint { color: #666; font-size: 0.8rem; }
+.duration-field input[type="range"] { width: 100%; accent-color: #aa3bff; }
 .btn-primary {
   padding: 12px 28px;
   background: #aa3bff;

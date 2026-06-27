@@ -1,19 +1,34 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useMapDraw } from '../composables/useMapDraw'
-import type { DrawShape, Extent } from '../types'
+import type { OutputOptions, AspectRatio, ResolutionPreset, DrawShape, Extent } from '../types'
 
-const props = defineProps<{ shape: DrawShape }>()
+const props = defineProps<{ modelValue: OutputOptions }>()
 const emit = defineEmits<{
+  'update:modelValue': [opts: OutputOptions]
   geometryDrawn: [payload: { extent: Extent }]
   cleared: []
 }>()
+
+function update(patch: Partial<OutputOptions>) {
+  emit('update:modelValue', { ...props.modelValue, ...patch })
+}
+
+const SHAPES: { value: DrawShape; label: string }[] = [
+  { value: 'box', label: 'Box' },
+  { value: 'circle', label: 'Circle' },
+]
+const ASPECT_RATIOS: AspectRatio[] = ['1:1', '4:3', '16:9', '9:16']
+const RESOLUTIONS: { value: ResolutionPreset; label: string }[] = [
+  { value: 'mobile', label: 'Mobile (1080px)' },
+  { value: 'hd', label: 'HD (1920px)' },
+]
 
 const mapEl = ref<HTMLDivElement | null>(null)
 const { drawnExtent, initMap, startDraw, clearDraw, destroyMap } = useMapDraw(mapEl)
 
 const drawHint = computed(() =>
-  props.shape === 'circle'
+  props.modelValue.drawShape === 'circle'
     ? 'Click to place the center, then click again to set the radius'
     : 'Click to start a corner, then click again to finish the rectangle'
 )
@@ -27,14 +42,14 @@ function handleClear() {
   emit('cleared')
 }
 
-watch(() => props.shape, (shape) => {
+watch(() => props.modelValue.drawShape, (shape) => {
   clearDraw()
   startDraw(shape)
 })
 
 onMounted(() => {
   initMap()
-  startDraw(props.shape)
+  startDraw(props.modelValue.drawShape)
 })
 
 onBeforeUnmount(() => {
@@ -46,6 +61,50 @@ onBeforeUnmount(() => {
   <div class="map-wrapper">
     <div ref="mapEl" class="map-container"></div>
     <p class="map-hint">{{ drawHint }}</p>
+    <div class="draw-options">
+      <div class="field">
+        <span class="field-label">Shape</span>
+        <div class="radio-group">
+          <label v-for="s in SHAPES" :key="s.value">
+            <input
+              type="radio"
+              :value="s.value"
+              :checked="modelValue.drawShape === s.value"
+              @change="update({ drawShape: s.value })"
+            />
+            {{ s.label }}
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label">Aspect</span>
+        <div class="radio-group">
+          <label v-for="ar in ASPECT_RATIOS" :key="ar">
+            <input
+              type="radio"
+              :value="ar"
+              :checked="modelValue.aspectRatio === ar"
+              @change="update({ aspectRatio: ar })"
+            />
+            {{ ar }}
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label">Resolution</span>
+        <div class="radio-group">
+          <label v-for="r in RESOLUTIONS" :key="r.value">
+            <input
+              type="radio"
+              :value="r.value"
+              :checked="modelValue.resolution === r.value"
+              @change="update({ resolution: r.value })"
+            />
+            {{ r.label }}
+          </label>
+        </div>
+      </div>
+    </div>
     <div class="map-controls">
       <button @click="handleClear" :disabled="!drawnExtent" class="btn">Clear</button>
       <button @click="confirm" :disabled="!drawnExtent" class="btn btn-primary">Confirm Area</button>
@@ -69,6 +128,19 @@ onBeforeUnmount(() => {
   color: #888;
   font-size: 0.8rem;
 }
+.draw-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 8px 12px;
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+}
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field-label { font-size: 0.75rem; color: #888; }
+.radio-group { display: flex; flex-wrap: wrap; gap: 12px; }
+.radio-group label { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 0.85rem; }
+.radio-group input { accent-color: #aa3bff; }
 .map-controls {
   padding: 8px 12px;
   display: flex;
