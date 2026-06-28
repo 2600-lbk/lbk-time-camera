@@ -46,6 +46,12 @@ export interface CanvasDimensions {
   height: number
 }
 
+/** Map pan/zoom state, in EPSG:3857, persisted so "Start Over" can restore it. */
+export interface MapViewState {
+  center: number[]
+  zoom: number
+}
+
 const LONG_EDGE: Record<ResolutionPreset, number> = { hd: 1920, mobile: 1080 }
 
 export function computeDims(opts: OutputOptions): CanvasDimensions {

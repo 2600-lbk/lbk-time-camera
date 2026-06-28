@@ -11,7 +11,7 @@ import { useImageFetch, bufferExtentToAspect } from './composables/useImageFetch
 import { useVideoEncoder, checkVideoEncoderSupport } from './composables/useVideoEncoder'
 import { useFrameRenderer } from './composables/useFrameRenderer'
 import { defaultOptions, computeDims } from './types'
-import type { AppStep, Extent } from './types'
+import type { AppStep, Extent, MapViewState } from './types'
 
 const { sources } = useConfig()
 
@@ -24,6 +24,7 @@ const step = ref<AppStep>('draw')
 const opts = ref(defaultOptions())
 const drawnExtent = ref<Extent | null>(null)
 const bufferedExtent = ref<Extent | null>(null)
+const savedMapView = ref<MapViewState | null>(null)
 const dims = computed(() => computeDims(opts.value))
 const showAbout = ref(false)
 
@@ -65,7 +66,7 @@ async function startEncoding() {
 function resetAll() {
   revokeFrames()
   step.value = 'draw'
-  opts.value = defaultOptions()
+  // Keep the user's output settings (shape, aspect, resolution, label, duration).
   drawnExtent.value = null
   bufferedExtent.value = null
   videoBlob.value = null
@@ -99,6 +100,8 @@ const frameDurationMs = computed(() =>
       <MapView
         v-if="step === 'draw'"
         v-model="opts"
+        :initial-view="savedMapView"
+        @view-change="savedMapView = $event"
         @geometry-drawn="onGeometryDrawn"
       />
 

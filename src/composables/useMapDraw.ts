@@ -15,7 +15,7 @@ import Fill from 'ol/style/Fill'
 import Stroke from 'ol/style/Stroke'
 import Style from 'ol/style/Style'
 import type RenderEvent from 'ol/render/Event'
-import type { Extent, DrawShape } from '../types'
+import type { Extent, DrawShape, MapViewState } from '../types'
 import countyGeoJSON from '../assets/lubbock_county_line.geojson'
 
 const LUBBOCK_CENTER = fromLonLat([-101.855, 33.577])
@@ -33,7 +33,7 @@ export function useMapDraw(containerRef: Ref<HTMLElement | null>) {
     fill: new Fill({ color: 'rgba(170, 59, 255, 0.06)' }),
   })
 
-  function initMap() {
+  function initMap(initialView?: MapViewState | null) {
     if (!containerRef.value) return
 
     const countySource = new VectorSource({
@@ -63,8 +63,8 @@ export function useMapDraw(containerRef: Ref<HTMLElement | null>) {
       target: containerRef.value,
       layers: [osmLayer, frameLayer, vectorLayer],
       view: new View({
-        center: LUBBOCK_CENTER,
-        zoom: 16,
+        center: initialView?.center ?? LUBBOCK_CENTER,
+        zoom: initialView?.zoom ?? 16,
       }),
     })
   }
@@ -115,6 +115,15 @@ export function useMapDraw(containerRef: Ref<HTMLElement | null>) {
     }
   }
 
+  function getViewState(): MapViewState | null {
+    if (!map) return null
+    const view = map.getView()
+    const center = view.getCenter()
+    const zoom = view.getZoom()
+    if (!center || zoom === undefined) return null
+    return { center, zoom }
+  }
+
   function destroyMap() {
     map?.dispose()
     map = null
@@ -127,6 +136,7 @@ export function useMapDraw(containerRef: Ref<HTMLElement | null>) {
     startDraw,
     clearDraw,
     setFrame,
+    getViewState,
     destroyMap,
   }
 }

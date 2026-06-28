@@ -3,11 +3,12 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useMapDraw } from '../composables/useMapDraw'
 import { bufferExtentToAspect } from '../composables/useImageFetch'
 import { computeDims } from '../types'
-import type { OutputOptions, AspectRatio, ResolutionPreset, DrawShape, Extent } from '../types'
+import type { OutputOptions, AspectRatio, ResolutionPreset, DrawShape, Extent, MapViewState } from '../types'
 
-const props = defineProps<{ modelValue: OutputOptions }>()
+const props = defineProps<{ modelValue: OutputOptions; initialView?: MapViewState | null }>()
 const emit = defineEmits<{
   'update:modelValue': [opts: OutputOptions]
+  'view-change': [view: MapViewState]
   geometryDrawn: [payload: { extent: Extent }]
   cleared: []
 }>()
@@ -27,7 +28,7 @@ const RESOLUTIONS: { value: ResolutionPreset; label: string }[] = [
 ]
 
 const mapEl = ref<HTMLDivElement | null>(null)
-const { drawnExtent, initMap, startDraw, clearDraw, setFrame, destroyMap } = useMapDraw(mapEl)
+const { drawnExtent, initMap, startDraw, clearDraw, setFrame, getViewState, destroyMap } = useMapDraw(mapEl)
 
 // Show the captured frame (selection expanded to the chosen aspect ratio) before confirming.
 watch([drawnExtent, () => props.modelValue.aspectRatio], () => {
@@ -60,11 +61,13 @@ watch(() => props.modelValue.drawShape, (shape) => {
 })
 
 onMounted(() => {
-  initMap()
+  initMap(props.initialView)
   startDraw(props.modelValue.drawShape)
 })
 
 onBeforeUnmount(() => {
+  const view = getViewState()
+  if (view) emit('view-change', view)
   destroyMap()
 })
 </script>
